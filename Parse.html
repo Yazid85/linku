@@ -1,0 +1,54 @@
+<style>
+.Prbg{width:auto;height:100%;background:#eef5ff;border-radius:8px;padding:20px;box-shadow: -3px -2px 4px rgb(255 255 255 / 90%), 5px 5px 8px rgb(0 0 0 / 7%);}
+.Prbtn{display:inline-block;align-items:center;justify-content:center;padding:10px 10px;outline:0;border:0;border-radius:5px;line-height:1em;color:inherit;background:#eef5ff;font-size:12px;white-space:nowrap;overflow:hidden;margin-top:16px;box-shadow: -3px -2px 4px rgb(255 255 255 / 90%), 5px 5px 8px rgb(0 0 0 / 7%)}
+.Prbtn.b{margin-left:18px}
+.note{box-shadow: -3px -2px 4px rgb(255 255 255 / 90%),5px 5px 8px rgb(0 0 0 / 7%)}
+.Prbg #iPr{background:#eef5ff;font-size:13px;border-radius:7px;box-shadow: -3px -2px 4px rgb(255 255 255 / 90%),5px 5px 8px rgb(0 0 0 / 7%);width: 100%;height: 150px;padding: 15px;border: 1px solid #eef5ff;}
+.Prbg #iPr:focus{border:1px solid #0b57cf;outline:0}
+.drK .Prbg #iPr{background:#2d2d30;box-shadow: -3px -2px 4px rgb(30 30 30),5px 5px 8px rgb(0 0 0 / 7%);border:1px solid #2d2d30}
+.drK .Prbg #iPr:focus{border:1px solid #0b57cf;box-shadow: 0 0 7px 0 rgba(255,255,255,.1)}
+.drK .Prbg,.drK .Prbtn {transition:0.1s;background:#2d2d30;box-shadow: -3px -2px 4px rgb(255 255 255 / 7%),5px 5px 8px rgb(0 0 0 / 7%)}
+.drK .note{box-shadow: 0 0 7px 0 rgba(255,255,255,.1)}
+</style>
+
+<div style='text-align:center' class='Prbg'>
+<textarea id='iPr' placeholder='Paste Kode Disini'></textarea>
+<button class='Prbtn' onclick='PrCv()'>Parse</button>
+<button class='Prbtn b' onclick='PrCp()'>Copy</button> 
+<button class='Prbtn b' onclick='PrCl()'>Clear</button>
+<p class='note hidden' id='Cpr'>Code Berhasil Disalin</p>
+<div id='Pcd' crd='https://yazidtips.com'></div>
+</div>
+  
+<script>
+function PrCv() {
+    var ele1 = document.getElementById("iPr");
+    var replaced;
+    replaced = ele1.value;
+    replaced = replaced.replace(/&/ig, "&amp;");
+    replaced = replaced.replace(/</ig, "&lt;");
+    replaced = replaced.replace(/>/ig, "&gt;");
+    replaced = replaced.replace(/"/ig, "&quot;");
+    replaced = replaced.replace(/'/ig, "&#039;");
+    replaced = replaced.replace(/&#177;/ig, "&plusmn;");
+    replaced = replaced.replace(/&#169;/ig, "&copy;");
+    replaced = replaced.replace(/&#174;/ig, "&reg;");
+    replaced = replaced.replace(/ya'll/ig, "ya'll");   
+    ele1.value = replaced;
+  }
+  function PrCp() {
+    document.getElementById('iPr').select();
+    document.execCommand('copy')
+    document.getElementById('Cpr').classList.remove('hidden')
+     setTimeout(function () {
+    document.getElementById('Cpr').classList.add('hidden');
+    }, 2000)
+  }
+  function PrCl(){
+    document.getElementById("iPr").value = "";
+  }
+  var crdt = document.getElementById('Pcd');
+  if (crdt.getAttribute("crd") != "https://yazidtips.com") {
+    window.location.href = "https://yazidtips.com";
+  }
+</script>
