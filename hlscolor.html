@@ -1,0 +1,179 @@
+<div class="container-CPT" id="app">
+	<header :class="{'colour-header-dark': lightness &gt; 70 || alpha &lt; 25}" :style="{backgroundColor: hsla}" class="colour-header" style="text-align: center;">
+		{{hsla}}
+	</header>
+	<div :class="{'colour-body-dark': lightness &gt; 90 || alpha &lt; 5}" class="body colour-body">
+		<div class="colour-slider">
+			<ranger :default="hue" :max="360" :thumb-color="hsla" :track-background="hueGradient" v-model="hue"></ranger>
+			<div class="colour-value" style="text-align: center;">
+				{{ hue }}
+			</div>
+		</div>
+		<div class="colour-slider">
+			<ranger :default="saturation" :thumb-color="hsla" :track-background="satGradient" v-model="saturation"></ranger>
+			<div class="colour-value" style="text-align: center;">
+				{{ saturation }}
+			</div>
+		</div>
+		<div class="colour-slider">
+			<ranger :default="lightness" :thumb-color="hsla" :track-background="lightGradient" v-model="lightness"></ranger>
+			<div class="colour-value" style="text-align: center;">
+				{{ lightness }}
+			</div>
+		</div>
+		<div class="colour-slider">
+			<ranger :default="alpha" :thumb-color="hsla" :track-background="alphaGradient" v-model="alpha"></ranger>
+			<div class="colour-value" style="text-align: center;">
+				{{ alpha }}</div><div><br /></div>
+		</div>
+	</div>
+</div>
+
+
+<script id="ranger" type="text/x-template">
+	<div class="ranger">
+		<input 
+			ref="control"
+			v-model="value"
+			:min="min" 
+			:max="max"
+			class="ranger-control" 
+			readonly="readonly"
+			type="range"
+			@input="$emit('input', value)"
+		>
+		<div 
+			ref="track" 
+			:style="{background: trackBackground}"
+			class="ranger-magic" 
+			@click="trackClicked">
+			<div 
+				ref="thumb"
+				:style="{left: `calc(${value} / ${max} * 100%)`, color: thumbColor}"
+				class="ranger-magic-thumb" 
+				@mousedown="thumbDown"
+				@touchstart="thumbDown"
+				@mouseup="thumbUp"
+				@touchend="thumbUp"
+				@click="thumbClick"
+			></div>
+		</div>
+	</div>
+</script>
+<!--partial-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js"></script>
+
+<style>
+@import 'https://fonts.googleapis.com/css?family=Anonymous+Pro:400,400i';.container-CPT{flex:1 0 auto;margin:50px 0;max-width:350px;border-radius:10px;background-color:#f3f3f3;overflow:hidden;font-family:"Anonymous Pro",monospace;}.ranger{position:relative;width:100%;}.ranger-control{position:absolute;height:0;width:100%;overflow:hidden;opacity:0;pointer-events:none;}.ranger-control:focus+.ranger-magic .ranger-magic-thumb{box-shadow:0 0 0 7px rgba(106,106,123,0.1);}.ranger-magic{position:relative;height:7px;border-radius:7px;background-color:#c5cdd5;}.ranger-magic-thumb{position:absolute;z-index:5;top:50%;height:24px;width:24px;box-shadow:0 0 0 0 rgba(106,106,123,0);border-radius:50%;background-color:currentColor;color:#6a6a7b;transform:translate(-50%,-50%);transition:left 0.15s,background-color 0.15s,transform 0.2s,box-shadow 0.5s ease-in-out;}.ranger-magic-thumb:active{box-shadow:0 0 0 10px rgba(106,106,123,0.2);}.ranger-magic-thumb:active::after{height:65%;width:65%;}.ranger-magic-thumb:hover{transform:translate(-50%,-50%) scale(1.2);cursor:pointer;}.ranger-magic-thumb::after{content:"";position:absolute;left:50%;top:50%;height:50%;width:50%;border-radius:50%;background-color:#fff;transform:translate(-50%,-50%);transition:0.4s;}.colour-slider{display:flex;align-items:center;margin-bottom:1rem;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;}.colour-value{flex:0 0 40px;text-align:right;pointer-events:none;}.colour-header{display:flex;align-items:flex-end;justify-content:flex-end;height:100px;padding:10px 30px;color:#fff;z-index:0;}.colour-header-dark{color:#444;}.colour-body{padding:30px;transition:0.35s;}.colour-body-dark{background-color:#525260;color:#fff;}
+</style>
+
+<script>
+console.clear();
+
+Vue.component('ranger', {
+  props: {
+    default: String,
+    min: {
+      type: Number,
+      default: 0 },
+
+    max: {
+      type: Number,
+      default: 100 },
+
+    trackBackground: String,
+    thumbColor: String },
+
+  data() {
+    return {
+      value: 0 };
+
+  },
+  mounted() {
+    if (this.default) {
+      this.value = this.default;
+    }
+  },
+  methods: {
+    setThumbLocation(e) {
+      const width = this.$refs.track.getBoundingClientRect().width;
+      const left = this.$refs.track.getBoundingClientRect().left;
+      const pos = e.x - left || e.touches[0].pageX - left;
+      const percent = pos / width * 100;
+      let thumbLeft = parseInt(percent / 100 * this.max);
+
+      if (thumbLeft < this.min) {
+        return this.min;
+      } else if (thumbLeft > this.max) {
+        return this.max;
+      } else {
+        return thumbLeft;
+      }
+    },
+    trackClicked(e) {
+      if (e.target === this.$refs.track) {
+        this.thumbMove(e);
+      }
+    },
+    thumbMove(e) {
+      this.value = this.setThumbLocation(e);
+      this.$emit('input', this.value);
+    },
+    thumbDown(e) {
+      document.addEventListener('mousemove', this.thumbMove);
+      document.addEventListener('touchmove', this.thumbMove);
+      document.addEventListener('mouseup', this.thumbUp);
+    },
+    thumbUp(e) {
+      document.removeEventListener('mousemove', this.thumbMove);
+      document.removeEventListener('touchmove', this.thumbMove);
+      document.removeEventListener('mouseup', this.thumbUp);
+      this.$refs.control.focus();
+    },
+    thumbClick() {
+      this.$refs.control.focus();
+    } },
+
+  template: '#ranger' });
+
+
+new Vue({
+  el: '#app',
+  data() {
+    return {
+      hue: 207,
+      saturation: 100,
+      lightness: 71,
+      alpha: 100 };
+
+  },
+  computed: {
+    hsla() {
+      return `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha / 100})`;
+    },
+    hueGradient() {
+      return `linear-gradient(90deg, 
+				hsla(0, ${this.saturation}%, ${this.lightness}%, ${this.alpha / 100}) 0%,
+				hsla(71, ${this.saturation}%, ${this.lightness}%, ${this.alpha / 100}) 20%,
+				hsla(142, ${this.saturation}%, ${this.lightness}%, ${this.alpha / 100}) 40%,
+				hsla(213, ${this.saturation}%, ${this.lightness}%, ${this.alpha / 100}) 60%,
+				hsla(284, ${this.saturation}%, ${this.lightness}%, ${this.alpha / 100}) 80%,
+				hsla(355, ${this.saturation}%, ${this.lightness}%, ${this.alpha / 100}) 100%)`;
+    },
+    satGradient() {
+      return `linear-gradient(90deg, 
+				hsla(${this.hue}, 0%, ${this.lightness}%, ${this.alpha / 100}) 0%,
+				hsla(${this.hue}, 100%, ${this.lightness}%, ${this.alpha / 100}) 100%)`;
+    },
+    lightGradient() {
+      return `linear-gradient(90deg, 
+				hsla(${this.hue}, ${this.saturation}%, 0%, ${this.alpha / 100}) 0%, 
+				hsla(${this.hue}, ${this.saturation}%, 50%, ${this.alpha / 100}) 50%, 
+				hsla(${this.hue}, ${this.saturation}%, 100%, ${this.alpha / 100}) 100%)`;
+    },
+    alphaGradient() {
+      return `linear-gradient(90deg, 
+				hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, 0) 0%, 
+				hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, 1) 100%)`;
+    } } });
+</script>
